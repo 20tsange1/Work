@@ -5,7 +5,10 @@ from random import *
 from time import time
 
 #some global constants
-CANVAS_WIDTH = 1000
+
+#Bugfix 1
+CANVAS_WIDTH = 1200
+
 CANVAS_HEIGHT = 700
 SPACING = 100
 speed = 0.0
@@ -35,7 +38,7 @@ def init_building(canvas, building_num, building_width, building_heights, buildi
     building_heights.append(height)
     x = building_num*SPACING
     building_xpos.append(x)
-    building_rects.append(canvas.create_rectangle(x, CANVAS_HEIGHT, x + building_width,
+    building_rects.append(canvas.create_rectangle(x+10, CANVAS_HEIGHT, x + 10 + building_width,
                                                   CANVAS_HEIGHT-height, fill="brown"))
 
 ''' is_inside_builing tests if point pos is inside building number
@@ -97,8 +100,11 @@ def move_bomb(pos):
 ''' drop the bomb from the plane at position plane_pos '''
 def drop_bomb(pos, plane_pos):
     global bomb_falling
+
+    #Bugfix 2
     if pos[1] >= CANVAS_HEIGHT:
-        bomb_falling = False
+        bomb_falling = False    
+
     if bomb_falling:
         # don't drop again while bomb is still falling
         return
@@ -160,7 +166,10 @@ def move_plane(pos):
     #position is a two element list: [x,y]
     pos[0] = pos[0] - 4 * speed
     if pos[0] < -plane_width:
+
+        #Bugfix 3
         pos[0] += CANVAS_WIDTH + 100
+
         pos[1] = pos[1] + 40
         #check we don't go off the bottom of the screen
         if pos[1] > CANVAS_HEIGHT:
@@ -181,7 +190,10 @@ def init_display(root, plane_pos, bomb_pos, building_heights, building_xpos, bui
     init_score(canvas)
 
     #create game objects
+
+    #Bugfix 3
     plane_pos[0] = CANVAS_WIDTH + 100
+
     plane_pos[1] = 0
     init_plane(canvas, plane_pos)
     init_bomb(canvas, bomb_pos)
@@ -213,13 +225,16 @@ def display_score(canvas, score, level):
 def create_buildings(canvas, building_width, building_heights, building_xpos, building_rects):
     #remove any old buildings
     if len(building_rects) > 0:
-        for building_num in range(0, 1000//SPACING):
+        for building_num in range(0, 1200//SPACING):
             delete_building(canvas, building_num, building_rects)
     building_heights.clear()
     building_xpos.clear()
 
+    #Bugfix 6
+    building_rects.clear()
+
     #create the new ones
-    for building_num in range(0, 1000//SPACING):
+    for building_num in range(0, 1200//SPACING):
         init_building(canvas, building_num, building_width, building_heights, building_xpos, building_rects)
 
 ''' check the state of the bomb each frame '''
@@ -227,7 +242,7 @@ def check_bomb(canvas, bomb_pos, building_width, building_heights, building_xpos
     if not bomb_falling:
         return
     # did the bomb hit a building?
-    for building_num in range(0, 1000//SPACING):
+    for building_num in range(0, 1200//SPACING):
         if is_inside_building(building_num, bomb_pos, building_width, building_heights, building_xpos):
             explode()
             shrink_building(canvas, building_num, building_width, building_heights, building_xpos, building_rects)
@@ -240,7 +255,7 @@ def check_plane(canvas, plane_pos, building_width, building_heights, building_xp
     plane_nose_pos = [plane_pos[0], plane_pos[1] + 28]
     plane_body_pos = [plane_pos[0] + 12, plane_pos[1] + 32]
     plane_wing_pos = [plane_pos[0] + 94, plane_pos[1] + 48]
-    for building_num in range(0, 1000//SPACING):
+    for building_num in range(0, 1200//SPACING):
         if (is_inside_building(building_num, plane_nose_pos, building_width,
                                building_heights, building_xpos)
             or is_inside_building(building_num, plane_body_pos, building_width,
@@ -248,6 +263,8 @@ def check_plane(canvas, plane_pos, building_width, building_heights, building_xp
             or is_inside_building(building_num, plane_wing_pos, building_width,
                                   building_heights, building_xpos)) :
             game_over(canvas)
+
+    #Bugfix 4
     if plane_body_pos[1] >= CANVAS_HEIGHT and plane_body_pos[0] < 20:
         plane_landed(canvas)
 
@@ -277,7 +294,13 @@ def plane_landed(canvas):
 def restart(canvas, plane_pos, building_heights,
             building_xpos, building_rects):
     global building_width, won, game_running, plane, msg_text
-    canvas.delete(msg_text)
+    
+    #Bugfix 5
+    try:
+        canvas.delete(msg_text)
+    except NameError:
+        pass
+    
     level = 1
     score = 0
     reset_plane_position(plane_pos)
