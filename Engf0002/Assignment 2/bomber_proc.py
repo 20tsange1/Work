@@ -56,7 +56,7 @@ def shrink_building(canvas, building_num, building_width, building_heights, buil
     building_heights[building_num] = building_heights[building_num] - 50
     canvas.delete(building_rects[building_num])
     x = building_xpos[building_num]
-    building_rects[building_num] = canvas.create_rectangle(x, CANVAS_HEIGHT, x + building_width,
+    building_rects[building_num] = canvas.create_rectangle(x + 10, CANVAS_HEIGHT, x + 10 + building_width,
                                                            CANVAS_HEIGHT-building_heights[building_num], fill="brown")
 
 ''' delete building number building_num from the canvas '''
