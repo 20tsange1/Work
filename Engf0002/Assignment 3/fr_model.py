@@ -263,8 +263,10 @@ class Model():
         # grid square)
         x = (spacing + GRID_SIZE)//2
         for i in range(0,6):
-            x = x + GRID_SIZE + spacing
+            
+            # Bugfix 5
             self.homes_x.append(x)
+            x = x + GRID_SIZE + spacing
             self.homes_occupied.append(False)
 
     def frog_is_home(self, home_num):
@@ -318,6 +320,9 @@ class Model():
     def new_life(self):
         self.controller.update_lives(self.lives)
 
+        #Bugfix 4
+        self.frog.reset_position()
+
     def game_over(self):
         self.game_running = False
         self.won = False
@@ -347,6 +352,9 @@ class Model():
         self.won = False
         self.paused = False
 
+        # Bugfix 3
+        self.game_running = True
+
     def move_frog(self, dir):
         if self.game_running and not self.paused:
             self.frog.move(dir)
@@ -368,7 +376,10 @@ class Model():
             # check if it's now on any other log
             for log in self.logs:
                 if log.contains(self.frog):
-                    on_long = log
+
+                    # Bugfix 1
+                    on_log = log
+                    
                     break
         if on_log is None:
             # frog is not on a log - it must be in the water
@@ -389,7 +400,7 @@ class Model():
     def check_frog_entering_home(self):
         # frog is attempting to enter home
         (x, y) = self.frog.get_position()
-        for i in range(0, 5):
+        for i in range(0, 6):
             if abs(self.homes_x[i] - x) < GRID_SIZE/2 and not self.homes_occupied[i]:
                 #we're in a free home
                 self.frog_is_home(i)

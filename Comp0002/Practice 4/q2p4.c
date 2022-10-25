@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "graphics.h"
+#include <math.h>
 
 int main() {
 
@@ -29,7 +31,48 @@ int main() {
     }
 
     // set foreground
-    
+
     foreground();
+
+    int stop = 0;
+    int x = 1;
+    int y = 1;
+    int xmulti = rand() % 10;
+    int ymulti = rand() % 10;
+    int xval = 1;
+    int yval = 1;
+    
+    while (stop == 0) {
+        setColour(red);
+        sleep(10);
+        clear();
+
+        if (x >= 500) {
+            xmulti = rand() % 10;
+            xval = -1;
+        }
+        else if (x <= 0) {
+            xmulti = rand() % 10;
+            xval = 1;
+        }
+
+        if (y >= 500) {
+            xmulti = rand() % 10;
+            yval = -1;
+        }
+        else if (y <= 0) {
+            xmulti = rand() % 10;
+            yval = 1;
+        }
+
+        ymulti = sqrt(10*10 - xmulti*xmulti);
+
+        x += xmulti * xval;
+        y += ymulti * yval;
+
+        fillOval(x,y,50,50);
+    }
+    
+    
 
 }

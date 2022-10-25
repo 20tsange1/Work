@@ -84,13 +84,14 @@ class Controller():
             view.game_over()
         
     def key(self, event):
+        # Bugfix 6
         if event.char == 'a' or event.keysym == 'Left':
             self.model.move_frog(Direction.LEFT)
-        elif event.char == 's' or event.keysym == 'Up':
+        elif event.char == 'w' or event.keysym == 'Up':
             self.model.move_frog(Direction.UP)
-        elif event.char == 'd' or event.keysym == 'Down':
+        elif event.char == 's' or event.keysym == 'Down':
             self.model.move_frog(Direction.DOWN)
-        elif event.char == 'f' or event.keysym == 'Right':
+        elif event.char == 'd' or event.keysym == 'Right':
             self.model.move_frog(Direction.RIGHT)
         elif event.char == 'q':
             self.running = False
