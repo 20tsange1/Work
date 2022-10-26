@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include "graphics.h"
 
+#define CanvasWidth 480
+#define CanvasHeight 480
+
 
 void drawMaze(int maze[12][12]) {
     background();
@@ -27,7 +30,7 @@ void drawMaze(int maze[12][12]) {
     }
 }
 
-void generateMaze(int maze[12][12]) {
+void generateMaze(int maze[12][12], int mazeStartEnd[4]) {
 
     //make maze using probablistic approach, skewed to generate longer lines
 
@@ -39,15 +42,68 @@ void generateMaze(int maze[12][12]) {
             else {
                 maze[y][x] = 0;
             }
+
+            // saying that the maze ends there
+            if (x == 11) {
+                mazeStartEnd[2] = x;
+                mazeStartEnd[3] = y;
+                break;
+            }
         }
     }
+
+    mazeStartEnd[0] = 0;
+    mazeStartEnd[1] = 1;
+
+
 }
 
-void drawRobot(int x, int y) {
+void drawRobot(int x, int y, int direction) {
     foreground();
-    clear();
     setColour(blue);
-    fillArc(x*40 + 5, y*40 + 5, 30, 30, 0, 360);
+    for (int i = 0; i < 40; i++) {
+        sleep(10);
+        clear();
+
+        switch (direction) {
+
+            case (-1):
+                fillArc(x * 40 + 5, y * 40 + 5, 30, 30, 0, 360);
+                break;
+
+            case (1):
+                fillArc(x * 40 + 5, (y-1) * 40 + 5 + i, 30, 30, 0, 360);
+                break;
+
+            case (2):
+                fillArc(x * 40 + 5, (y+1) * 40 + 5 + i, 30, 30, 0, 360);
+                break;
+
+            case (3):
+                fillArc((x-1) * 40 + 5 + i, y * 40 + 5, 30, 30, 0, 360);
+                break;
+
+            case (4):
+                fillArc((x+1) * 40 + 5 + i, y * 40 + 5, 30, 30, 0, 360);
+                break;
+
+        }
+    }
+    
+}
+
+void endFound() {
+    clear();
+    background();
+    clear();
+
+    setColour(black);
+    fillRect(0, 0, CanvasWidth, CanvasHeight);
+
+    foreground();
+    setColour(white);
+    drawString("Robot has solved the maze", 150, 240);
+
 }
 
 // Example basic maze ( 0 = black 1 = white)
@@ -59,13 +115,15 @@ void drawRobot(int x, int y) {
 
 int main() {
 
-    setWindowSize(480,480);
+    setWindowSize(CanvasWidth,CanvasHeight);
 
-    int maze[12][12] = { {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} , {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+    int maze[12][12] = { {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} , {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+    // Array containing start and end of maze
+    int mazeStartEnd[4];
 
     //int maze[12][12];
 
-    //generateMaze(maze);
+    //generateMaze(maze, mazeStartEnd);
 
     drawMaze(maze);
 
@@ -75,9 +133,10 @@ int main() {
     int lastRobotX = 0;
     int lastRobotY = 0;
 
-    while ( (robotY != 12) || (robotX != 0) ) {
-        sleep(100);
-        drawRobot(robotX, robotY);
+    int direction = -1; // Up = 1 Down = 2 Right = 3 Left = 4
+
+    while ( (robotY != mazeStartEnd[2]) || (robotX != mazeStartEnd[3]) ) {
+        drawRobot(robotX, robotY, direction);
 
         // Condition should be so that it moves in a new direction continously.
 
@@ -85,28 +144,48 @@ int main() {
             robotY += 1;
 
             lastRobotY = robotY - 1;
+
+            direction = 1;
         }
 
         else if ( (maze[robotY - 1][robotX] == 1) && ( ( ( robotY - 1 ) != lastRobotY) && ( robotX != lastRobotX) ) ) {
             robotY -= 1;
              
             lastRobotY = robotY + 1;
+
+            direction = 2;
         }
 
         else if ( (maze[robotY][robotX + 1] == 1) && ( ( ( robotX + 1 ) != lastRobotX) && ( robotY != lastRobotY) ) ) {
             robotX += 1;
+
             lastRobotX = robotX - 1;
+
+            direction = 3;
         }
 
         else if ( (maze[robotY][robotX - 1] == 1) && ( ( ( robotX - 1 ) != lastRobotX) && ( robotY != lastRobotY) ) ) {
             robotX -= 1;
+
             lastRobotX = robotX + 1;
+
+            direction = 4;
         }
 
-        
 
+        
+        printf("%i, %i\n", robotX, robotY);
 
     }
+
+
+    // end sequence as loop ends when maze end is found but not travelled to.
+    drawRobot(robotX, robotY, direction);
+    direction = -1;
+    drawRobot(robotX, robotY, direction);
+
+    endFound();
+
 
     return 0;
 }
