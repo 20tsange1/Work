@@ -46,17 +46,16 @@ void resetMaze(int maze[17][17])
     }
 }
 
-int createExit(int maze[17][17])
+void createExit(int maze[17][17])
 {
     for (int i = 16; i > 1; i--)
     {
         if (maze[i][15] == 1)
         {
             maze[i][16] = 1;
-            return i;
+            break;
         }
     }
-    return -1;
 }
 
 int mazeTouched(int mazeTouch[17][17])
@@ -74,19 +73,21 @@ int mazeTouched(int mazeTouch[17][17])
     return 0;
 }
 
-void generateMaze(int maze[17][17], int currentX, int currentY, int prevOrientation)
+void generateMaze(int maze[17][17], int mazeTouch[17][17], int mazeStartEnd[4], int currentX, int currentY, int prevOrientation)
 {
     int direction;
 
-    // This is so it starts at a random direction first before cycling through the rest.
+    // make maze using probablistic approach, skewed to generate longer lines
+
+    // add so that it can be generated on the left too. (if all 4 sides empty, extend)
+    // add so that it can extend in any direction from 1 to some n length (Needs to include going left and going up)
+
+    int success = 1;
     int dire = rand() % 4;
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
-        // So all 4 sides are attempted
         direction = (dire + i) % 4;
-
-        // So it doesn't backtrack
         if (direction != prevOrientation)
         {
 
@@ -96,97 +97,44 @@ void generateMaze(int maze[17][17], int currentX, int currentY, int prevOrientat
 
             // left
             case (0):
-                if (((currentX - 1 > 0) && (maze[currentY][currentX - 2] == 0)) && ((maze[currentY + 1][currentX - 1] == 0) && (maze[currentY - 1][currentX - 1] == 0)))
+                if ( ((currentX - 2 > 0) && (currentX - 1 > 0) && (maze[currentY][currentX - 3] == 0)) && ((maze[currentY + 1][currentX - 2] == 0) && (maze[currentY - 1][currentX - 2] == 0)) && ((maze[currentY + 1][currentX - 1] == 0) && (maze[currentY - 1][currentX - 1] == 0)))
                 {
                     maze[currentY][currentX - 1] = 1;
-                    generateMaze(maze, currentX - 1, currentY, 1);
+                    maze[currentY][currentX - 2] = 1;
+
+                    generateMaze(maze, mazeTouch, mazeStartEnd, currentX - 1, currentY, 1);
                 }
                 break;
 
             // right
             case (1):
-                if (((currentX + 1 < 16) && (maze[currentY][currentX + 2] == 0)) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY - 1][currentX + 1] == 0)))
+                if ( ((currentX + 2 < 16) && (currentX + 1 < 16) && (maze[currentY][currentX + 3] == 0)) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY - 1][currentX + 1] == 0)) && ((maze[currentY + 1][currentX + 2] == 0) && (maze[currentY - 1][currentX + 2] == 0)))
                 {
                     maze[currentY][currentX + 1] = 1;
-                    generateMaze(maze, currentX + 1, currentY, 0);
+                    maze[currentY][currentX + 2] = 1;                    
+                    generateMaze(maze, mazeTouch, mazeStartEnd, currentX + 1, currentY, 0);
                 }
                 break;
 
             // up
             case (2):
-                if (((currentY - 1 > 0) && (maze[currentY - 2][currentX] == 0)) && ((maze[currentY - 1][currentX + 1] == 0) && (maze[currentY - 1][currentX - 1] == 0)))
+                if ( ((currentY - 1 > 0) && (currentY - 2 > 0) && (maze[currentY - 3][currentX] == 0)) && ((maze[currentY - 1][currentX + 1] == 0) && (maze[currentY - 1][currentX - 1] == 0)) && ((maze[currentY - 2][currentX + 1] == 0) && (maze[currentY - 2][currentX - 1] == 0)))
                 {
                     maze[currentY - 1][currentX] = 1;
-                    generateMaze(maze, currentX, currentY - 1, 3);
+                    maze[currentY - 2][currentX] = 1;
+                    
+                    generateMaze(maze, mazeTouch, mazeStartEnd, currentX, currentY - 1, 3);
                 }
                 break;
 
             // down
             case (3):
-                if (((currentY + 1 < 16) && (maze[currentY + 2][currentX] == 0)) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY + 1][currentX - 1] == 0)))
+                if ( ((currentY + 1 < 16) && (currentY + 2 < 16) && (maze[currentY + 3][currentX] == 0)) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY + 1][currentX - 1] == 0)) && ((maze[currentY + 2][currentX + 1] == 0) && (maze[currentY + 2][currentX - 1] == 0)))
                 {
                     maze[currentY + 1][currentX] = 1;
-                    generateMaze(maze, currentX, currentY + 1, 2);
-                }
-                break;
-            }
-        }
-    }
-}
-
-void generateLoopMaze(int maze[17][17], int currentX, int currentY, int prevOrientation)
-{
-    int direction;
-
-    // This is so it starts at a random direction first before cycling through the rest.
-    int dire = rand() % 4;
-
-    for (int i = 0; i < 3; i++)
-    {
-        // Tries all sides
-        direction = (dire + i) % 4;
-
-        // So it doesn't backtrack while generating
-        if (direction != prevOrientation)
-        {
-
-            printf("%i\n", direction);
-            switch (direction)
-            {
-
-            // left
-            case (0):
-                if ((currentX - 1 > 0) && ((maze[currentY + 1][currentX - 1] == 0) && (maze[currentY - 1][currentX - 1] == 0)))
-                {
-                    maze[currentY][currentX - 1] = 1;
-                    generateLoopMaze(maze, currentX - 1, currentY, 1);
-                }
-                break;
-
-            // right
-            case (1):
-                if ((currentX + 1 < 16) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY - 1][currentX + 1] == 0)))
-                {
-                    maze[currentY][currentX + 1] = 1;
-                    generateLoopMaze(maze, currentX + 1, currentY, 0);
-                }
-                break;
-
-            // up
-            case (2):
-                if ((currentY - 1 > 0) && ((maze[currentY - 1][currentX + 1] == 0) && (maze[currentY - 1][currentX - 1] == 0)))
-                {
-                    maze[currentY - 1][currentX] = 1;
-                    generateLoopMaze(maze, currentX, currentY - 1, 3);
-                }
-                break;
-
-            // down
-            case (3):
-                if ((currentY + 1 < 16) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY + 1][currentX - 1] == 0)))
-                {
-                    maze[currentY + 1][currentX] = 1;
-                    generateLoopMaze(maze, currentX, currentY + 1, 2);
+                    maze[currentY + 2][currentX] = 1;
+                    
+                    generateMaze(maze, mazeTouch, mazeStartEnd, currentX, currentY + 1, 2);
                 }
                 break;
             }
@@ -260,7 +208,11 @@ int main()
 
     setWindowSize(CanvasWidth, CanvasHeight);
 
-    // change to calloc? so memory gets allocated and bits get changed to 0. This prevents old memory from being accessed.
+    // int maze[17][17] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+    //  Array containing start and end of maze
+    int mazeStartEnd[4];
+
+    // change to calloc, so memory gets allocated and bits get changed to 0. This prevents old memory from being accessed.
     // int maze[17][17] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
     int maze[17][17];
@@ -271,34 +223,26 @@ int main()
 
     int currentX = 1;
     int currentY = 1;
-    int loop = 0;
 
     maze[1][0] = 1;
     maze[currentY][currentX] = 1;
 
-    switch (loop)
-    {
-    case (0):
-        generateMaze(maze, currentX, currentY, 0);
-        break;
-
-    case (1):
-        generateLoopMaze(maze, currentX, currentY, 0);
-        break;
-    }
+    generateMaze(maze, mazeTouch, mazeStartEnd, currentX, currentY, 0);
 
     // Creating a valid exit on the rightmost side.
-    int mazeEnd = createExit(maze);
+    createExit(maze);
 
     drawMaze(maze);
 
-    // solveMaze(0);
+    // solveMaze(mazeStartEnd, 0);
 
     // Condition should be so that it moves in a new direction continously.
 
     // Take rights until at dead ends, then take lefts
 
     // end sequence as loop ends when maze end is found but not travelled to.
+
+    // endFound();
 
     return 0;
 }
