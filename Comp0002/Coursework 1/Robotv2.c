@@ -6,22 +6,35 @@
 #include "graphics.h"
 #include <time.h>
 
-#define CanvasWidth 680
-#define CanvasHeight 680
+
+
+#define Gridheight 17
+#define Gridwidth 17
+
+#define SideLength 40
+
+#define CanvasHeight (SideLength * Gridheight)
+#define CanvasWidth (SideLength * Gridwidth)
+
+#define BotDiameter SideLength*3/4
+
+#define BotOffset (SideLength - BotDiameter)/2
 
 #define Right 0
 #define Down 1
 #define Left 2
 #define Up 3
 
-void drawMaze(int maze[17][17])
+
+
+void drawMaze(int maze[Gridheight][Gridwidth])
 {
     background();
     setColour(black);
 
-    for (int y = 0; y < 17; y++)
+    for (int y = 0; y < Gridheight; y++)
     {
-        for (int x = 0; x < 17; x++)
+        for (int x = 0; x < Gridwidth; x++)
         {
             if (maze[y][x] == 1)
             {
@@ -31,43 +44,43 @@ void drawMaze(int maze[17][17])
             {
                 setColour(black);
             }
-            fillRect(x * 40, y * 40, x * 40 + 40, y * 40 + 40);
+            fillRect(x * SideLength, y * SideLength, x * SideLength + SideLength, y * SideLength + SideLength);
             setColour(black);
-            drawRect(x * 40, y * 40, x * 40 + 40, y * 40 + 40);
+            drawRect(x * SideLength, y * SideLength, x * SideLength + SideLength, y * SideLength + SideLength);
         }
     }
 }
 
-void resetMaze(int maze[17][17])
+void resetMaze(int maze[Gridheight][Gridwidth])
 {
 
-    for (int y = 0; y < 17; y++)
+    for (int y = 0; y < Gridheight; y++)
     {
-        for (int x = 0; x < 17; x++)
+        for (int x = 0; x < Gridwidth; x++)
         {
             maze[y][x] = 0;
         }
     }
 }
 
-int createExit(int maze[17][17])
+int createExit(int maze[Gridheight][Gridwidth])
 {
-    for (int i = 16; i > 1; i--)
+    for (int i = Gridheight - 1; i > 1; i--)
     {
-        if (maze[i][15] == 1)
+        if (maze[i][Gridwidth - 2] == 1) // To check if there is a valid previous passage to enter from.
         {
-            maze[i][16] = 1;
+            maze[i][Gridwidth - 1] = 1;
             return i;
         }
     }
     return -1;
 }
 
-int mazeTouched(int mazeTouch[17][17])
+int mazeTouched(int mazeTouch[Gridheight][Gridwidth])
 {
-    for (int y = 0; y < 17; y++)
+    for (int y = 0; y < Gridheight; y++)
     {
-        for (int x = 0; x < 17; x++)
+        for (int x = 0; x < Gridwidth; x++)
         {
             if (mazeTouch[y][x] == 0)
             {
@@ -79,7 +92,7 @@ int mazeTouched(int mazeTouch[17][17])
 }
 
 // Recursive algorithm to generate maze by exploring path possibilities.
-void generateMaze(int maze[17][17], int currentX, int currentY, int prevOrientation)
+void generateMaze(int maze[Gridheight][Gridwidth], int currentX, int currentY, int prevOrientation)
 {
     int direction;
 
@@ -109,7 +122,7 @@ void generateMaze(int maze[17][17], int currentX, int currentY, int prevOrientat
 
             // right
             case (1):
-                if (((currentX + 1 < 16) && (maze[currentY][currentX + 2] == 0)) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY - 1][currentX + 1] == 0)))
+                if (((currentX + 1 < Gridwidth - 1) && (maze[currentY][currentX + 2] == 0)) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY - 1][currentX + 1] == 0)))
                 {
                     maze[currentY][currentX + 1] = 1;
                     generateMaze(maze, currentX + 1, currentY, 0);
@@ -127,7 +140,7 @@ void generateMaze(int maze[17][17], int currentX, int currentY, int prevOrientat
 
             // down
             case (3):
-                if (((currentY + 1 < 16) && (maze[currentY + 2][currentX] == 0)) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY + 1][currentX - 1] == 0)))
+                if (((currentY + 1 < Gridheight - 1) && (maze[currentY + 2][currentX] == 0)) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY + 1][currentX - 1] == 0)))
                 {
                     maze[currentY + 1][currentX] = 1;
                     generateMaze(maze, currentX, currentY + 1, 2);
@@ -138,7 +151,7 @@ void generateMaze(int maze[17][17], int currentX, int currentY, int prevOrientat
     }
 }
 
-void generateLoopMaze(int maze[17][17], int currentX, int currentY, int prevOrientation)
+void generateLoopMaze(int maze[Gridheight][Gridwidth], int currentX, int currentY, int prevOrientation)
 {
     int direction;
 
@@ -168,7 +181,7 @@ void generateLoopMaze(int maze[17][17], int currentX, int currentY, int prevOrie
 
             // right
             case (1):
-                if ((currentX + 1 < 16) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY - 1][currentX + 1] == 0)))
+                if ((currentX + 1 < Gridwidth - 1) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY - 1][currentX + 1] == 0)))
                 {
                     maze[currentY][currentX + 1] = 1;
                     generateLoopMaze(maze, currentX + 1, currentY, 0);
@@ -186,7 +199,7 @@ void generateLoopMaze(int maze[17][17], int currentX, int currentY, int prevOrie
 
             // down
             case (3):
-                if ((currentY + 1 < 16) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY + 1][currentX - 1] == 0)))
+                if ((currentY + 1 < Gridheight - 1) && ((maze[currentY + 1][currentX + 1] == 0) && (maze[currentY + 1][currentX - 1] == 0)))
                 {
                     maze[currentY + 1][currentX] = 1;
                     generateLoopMaze(maze, currentX, currentY + 1, 2);
@@ -197,8 +210,6 @@ void generateLoopMaze(int maze[17][17], int currentX, int currentY, int prevOrie
     }
 }
 
-// saying that the maze ends there
-//}
 
 void drawRobot(int x, int y, int direction)
 {
@@ -206,36 +217,35 @@ void drawRobot(int x, int y, int direction)
     setColour(blue);
 
     // Creates illusion of movement by redrawing the robot 40 times.
-    for (int i = 0; i < 40; i++)
+    for (int i = 0; i < SideLength; i++)
     {
-        sleep(10);
+        sleep(5);
         clear();
 
         switch (direction)
         {
         case (Right):
-            fillArc((x - 1) * 40 + 5 + i, y * 40 + 5, 30, 30, 0, 360);
+            fillArc((x - 1) * SideLength + BotOffset + i, y * SideLength + BotOffset, BotDiameter, BotDiameter, 0, 360);
             break;
 
         case (Down):
-            fillArc(x * 40 + 5, (y - 1) * 40 + 5 + i, 30, 30, 0, 360);
+            fillArc(x * SideLength + BotOffset, (y - 1) * SideLength + BotOffset + i, BotDiameter, BotDiameter, 0, 360);
             break;
 
         case (Left):
-            fillArc((x + 1) * 40 + 5 - i, y * 40 + 5, 30, 30, 0, 360);
+            fillArc((x + 1) * SideLength + BotOffset - i, y * SideLength + BotOffset, BotDiameter, BotDiameter, 0, 360);
             break;
 
         case (Up):
-            fillArc(x * 40 + 5, (y + 1) * 40 + 5 - i, 30, 30, 0, 360);
+            fillArc(x * SideLength + BotOffset, (y + 1) * SideLength + BotOffset - i, BotDiameter, BotDiameter, 0, 360);
             break;
         }
     }
 }
 
 // As robot shouldn't directly have access to map layout.
-int queryMaze(int maze[17][17], int robotX, int robotY, int direction)
+int canMoveForward(int maze[Gridheight][Gridwidth], int robotX, int robotY, int direction)
 {
-
     switch (direction)
     {
     case (Right):
@@ -271,8 +281,86 @@ int atMarker(int mazeEnd[2], int robotX, int robotY)
     return -1;
 }
 
+void forward(int* direction, int* robotX, int* robotY)
+{
+    switch (*direction)
+    {
+    // Right
+    case (Right):
+        *robotX += 1;
+        break;
 
-void solveMaze(int maze[17][17], int mazeEnd[2], int mazeStart[2], int* direction, int* robotX, int* robotY)
+    // DownX
+    case (Down):
+        *robotY += 1;
+        break;
+
+    // Left
+    case (Left):
+        *robotX -= 1;
+        break;
+
+    // Up
+    case (Up):
+        *robotY -= 1;
+        break;
+    }
+
+}
+
+void left(int* direction)
+{
+    switch (*direction)
+    {
+    // Right
+    case (Right):
+        *direction = Up;
+        break;
+
+    // DownX
+    case (Down):
+        *direction = Right;
+        break;
+
+    // Left
+    case (Left):
+        *direction = Down;
+        break;
+
+    // Up
+    case (Up):
+        *direction = Left;
+        break;
+    }
+}
+
+void right(int* direction)
+{
+    switch (*direction)
+    {
+    // Right
+    case (Right):
+        *direction = Down;
+        break;
+
+    // DownX
+    case (Down):
+        *direction = Left;
+        break;
+
+    // Left
+    case (Left):
+        *direction = Up;
+        break;
+
+    // Up
+    case (Up):
+        *direction = Right;
+        break;
+    }
+}
+
+void solveMaze(int maze[Gridheight][Gridwidth], int mazeEnd[2], int mazeStart[2], int* direction, int* robotX, int* robotY)
 {
 
     // make empty list, then add items whenever a new step is made, then use it at end as the solved maze path
@@ -299,20 +387,20 @@ void solveMaze(int maze[17][17], int mazeEnd[2], int mazeStart[2], int* directio
         // Right
         case (Right):
             // Facing right
-            if ((queryMaze(maze, *robotX, *robotY, Down) == 0) && (queryMaze(maze, *robotX, *robotY, Right) == 1))
+            if ((canMoveForward(maze, *robotX, *robotY, Down) == 0) && (canMoveForward(maze, *robotX, *robotY, Right) == 1))
             {
-                *robotX += 1;
+                forward(&*direction, &*robotX, &*robotY); // not actually needed, but here for requirements
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Down) == 1)
+            else if (canMoveForward(maze, *robotX, *robotY, Down) == 1)
             {
-                *direction = Down;
-                *robotY += 1;
+                right(&*direction);
+                forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Right) == 0)
+            else if (canMoveForward(maze, *robotX, *robotY, Right) == 0)
             {
-                *direction = Up;
+                left(&*direction);
             }
 
             break;
@@ -320,20 +408,20 @@ void solveMaze(int maze[17][17], int mazeEnd[2], int mazeStart[2], int* directio
         // Down
         case (Down):
             // Facing down
-            if ((queryMaze(maze, *robotX, *robotY, Left) == 0) && (queryMaze(maze, *robotX, *robotY, Down) == 1))
+            if ((canMoveForward(maze, *robotX, *robotY, Left) == 0) && (canMoveForward(maze, *robotX, *robotY, Down) == 1))
             {
-                *robotY += 1;
+                forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Left) == 1)
+            else if (canMoveForward(maze, *robotX, *robotY, Left) == 1)
             {
-                *direction = Left;
-                *robotX -= 1;
+                right(&*direction);
+                forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Down) == 0)
+            else if (canMoveForward(maze, *robotX, *robotY, Down) == 0)
             {
-                *direction = Right;
+                left(&*direction);
             }
 
             break;
@@ -341,20 +429,20 @@ void solveMaze(int maze[17][17], int mazeEnd[2], int mazeStart[2], int* directio
         // Left
         case (Left):
             // Facing left
-            if ((queryMaze(maze, *robotX, *robotY, Up) == 0) && (queryMaze(maze, *robotX, *robotY, Left) == 1))
+            if ((canMoveForward(maze, *robotX, *robotY, Up) == 0) && (canMoveForward(maze, *robotX, *robotY, Left) == 1))
             {
-                *robotX -= 1;
+                forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if ((queryMaze(maze, *robotX, *robotY, Up) == 1))
+            else if ((canMoveForward(maze, *robotX, *robotY, Up) == 1))
             {
-                *direction = Up;
-                *robotY -= 1;
+                right(&*direction);
+                forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Left) == 0)
+            else if (canMoveForward(maze, *robotX, *robotY, Left) == 0)
             {
-                *direction = Down;
+                left(&*direction);
             }
 
             break;
@@ -362,20 +450,20 @@ void solveMaze(int maze[17][17], int mazeEnd[2], int mazeStart[2], int* directio
         // Up
         case (Up):
             // Facing up
-            if ((queryMaze(maze, *robotX, *robotY, Right) == 0) && (queryMaze(maze, *robotX, *robotY, Up) == 1))
+            if ((canMoveForward(maze, *robotX, *robotY, Right) == 0) && (canMoveForward(maze, *robotX, *robotY, Up) == 1))
             {
-                *robotY -= 1;
+                forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if ((queryMaze(maze, *robotX, *robotY, Right) == 1))
+            else if ((canMoveForward(maze, *robotX, *robotY, Right) == 1))
             {
-                *direction = Right;
-                *robotX += 1;
+                right(&*direction);
+                forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Up) == 0)
+            else if (canMoveForward(maze, *robotX, *robotY, Up) == 0)
             {
-                *direction = Left;
+                left(&*direction);
             }
 
             break;
@@ -396,22 +484,20 @@ void endFound()
 
     foreground();
     setColour(white);
-    drawString("Robot has solved the maze", 250, 340);
+    drawString("Robot has solved the maze", 280, 340);
 }
 
 // Example basic maze ( 0 = black 1 = white)
 
 int main()
 {
-
+    // Initialisation of a new seed for the random function.
     srand((unsigned int)time(NULL));
 
     setWindowSize(CanvasWidth, CanvasHeight);
 
-    // change to calloc? so memory gets allocated and bits get changed to 0. This prevents old memory from being accessed.
-
-    int maze[17][17];
-    int mazeTouch[17][17];
+    int maze[Gridheight][Gridwidth];
+    int mazeTouch[Gridheight][Gridwidth];
 
     int currentX = 1;
     int currentY = 1;
@@ -450,7 +536,7 @@ int main()
     }
 
     // Creating a valid exit on the rightmost side.
-    mazeEnd[0] = 16;
+    mazeEnd[0] = Gridwidth - 1;
     mazeEnd[1] = createExit(maze);
 
     drawMaze(maze);
