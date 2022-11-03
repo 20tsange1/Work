@@ -2,6 +2,30 @@
     "files.associations": {
         "array": "c",
         "vector": "c",
-        "__node_handle": "c"
+        "__node_handle": "c",
+        "__hash_table": "c",
+        "__locale": "c",
+        "functional": "c",
+        "ios": "c",
+        "algorithm": "c",
+        "complex": "c",
+        "locale": "c",
+        "ostream": "c",
+        "ratio": "c",
+        "__split_buffer": "c",
+        "concepts": "c",
+        "__memory": "c",
+        "iterator": "c",
+        "memory_resource": "c",
+        "iosfwd": "c",
+        "istream": "c",
+        "memory": "c",
+        "mutex": "c",
+        "optional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "unordered_map": "c",
+        "utility": "c",
+        "variant": "c"
     }
 }
