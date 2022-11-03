@@ -1,12 +1,12 @@
 The maze generation program utilises a 2D array and my implementation of a recursive random direction maze path generator to build a maze. 
 
-![](/mazeScreenshot.png)
+![](https://github.com/20tsange1/Work/blob/main/Comp0002/Coursework%201/mazeScreenshot.png)
 
 The robot then attempts to solve the maze using the right hand to the wall rule.
 
 When complete, the program will then print out the solution (shortest) path for the maze in red.
 
-![](/solvedMazeScreenshot.png)
+![](https://github.com/20tsange1/Work/blob/main/Comp0002/Coursework%201/solvedMazeScreenshot.png)
 
 Pointers are used within the main functions where possible to alter variables declared in main without intialising new variables.
 
