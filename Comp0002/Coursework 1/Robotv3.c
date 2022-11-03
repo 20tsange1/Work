@@ -104,7 +104,7 @@ void generateMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int currentX, int currentY,
     // This is so it starts at a random direction first before cycling through the rest.
     int firstDirection = rand() % 4;
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         // So all 4 sides are attempted
         direction = (firstDirection + i) % 4;
@@ -236,28 +236,26 @@ void setX(int coordX[3], int x, int i, int direction)
 {
     switch (direction)
     {
+
+    case (DOWN):
+    case (UP):
+    {
+        coordX[0] = x * SIDE_LENGTH + BOT_OFFSET + i;
+        coordX[1] = (x + 1) * SIDE_LENGTH - BOT_OFFSET + i;
+        coordX[2] = x * SIDE_LENGTH + SIDE_LENGTH / 2 + i;
+        break;
+    }
+
     case (RIGHT):
         coordX[0] = x * SIDE_LENGTH + BOT_OFFSET + i;
         coordX[1] = x * SIDE_LENGTH + BOT_OFFSET + i;
         coordX[2] = (x + 1) * SIDE_LENGTH - BOT_OFFSET + i;
         break;
 
-    case (DOWN):
-        coordX[0] = x * SIDE_LENGTH + BOT_OFFSET + i;
-        coordX[1] = (x + 1) * SIDE_LENGTH - BOT_OFFSET + i;
-        coordX[2] = x * SIDE_LENGTH + SIDE_LENGTH / 2 + i;
-        break;
-
     case (LEFT):
         coordX[0] = (x + 1) * SIDE_LENGTH - BOT_OFFSET + i;
         coordX[1] = (x + 1) * SIDE_LENGTH - BOT_OFFSET + i;
         coordX[2] = x * SIDE_LENGTH + BOT_OFFSET + i;
-        break;
-
-    case (UP):
-        coordX[0] = x * SIDE_LENGTH + BOT_OFFSET + i;
-        coordX[1] = (x + 1) * SIDE_LENGTH - BOT_OFFSET + i;
-        coordX[2] = x * SIDE_LENGTH + SIDE_LENGTH / 2 + i;
         break;
     }
 }
@@ -267,21 +265,18 @@ void setY(int coordY[3], int y, int i, int direction)
     switch (direction)
     {
     case (RIGHT):
+    case (LEFT):
+    {
         coordY[0] = y * SIDE_LENGTH + BOT_OFFSET + i;
         coordY[1] = (y + 1) * SIDE_LENGTH - BOT_OFFSET + i;
         coordY[2] = y * SIDE_LENGTH + SIDE_LENGTH / 2 + i;
         break;
+    }
 
     case (DOWN):
         coordY[0] = y * SIDE_LENGTH + BOT_OFFSET + i;
         coordY[1] = y * SIDE_LENGTH + BOT_OFFSET + i;
         coordY[2] = (y + 1) * SIDE_LENGTH - BOT_OFFSET + i;
-        break;
-
-    case (LEFT):
-        coordY[0] = y * SIDE_LENGTH + BOT_OFFSET + i;
-        coordY[1] = (y + 1) * SIDE_LENGTH - BOT_OFFSET + i;
-        coordY[2] = y * SIDE_LENGTH + SIDE_LENGTH / 2 + i;
         break;
 
     case (UP):
@@ -361,16 +356,7 @@ int canMoveForward(int maze[GRID_HEIGHT][GRID_WIDTH], int *robotX, int *robotY, 
 
 int atMarker(int mazeEnd[2], int *robotX, int *robotY)
 {
-    if ((*robotX == mazeEnd[0]) && (*robotY == mazeEnd[1]))
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-
-    return -1;
+    return ((*robotX == mazeEnd[0]) && (*robotY == mazeEnd[1]));
 }
 
 void forward(int *direction, int *robotX, int *robotY)
@@ -397,46 +383,12 @@ void forward(int *direction, int *robotX, int *robotY)
 
 void left(int *direction)
 {
-    switch (*direction)
-    {
-    case (RIGHT):
-        *direction = UP;
-        break;
-
-    case (DOWN):
-        *direction = RIGHT;
-        break;
-
-    case (LEFT):
-        *direction = DOWN;
-        break;
-
-    case (UP):
-        *direction = LEFT;
-        break;
-    }
+    *direction = (*direction + 4 - 1) % 4;
 }
 
 void right(int *direction)
 {
-    switch (*direction)
-    {
-    case (RIGHT):
-        *direction = DOWN;
-        break;
-
-    case (DOWN):
-        *direction = LEFT;
-        break;
-
-    case (LEFT):
-        *direction = UP;
-        break;
-
-    case (UP):
-        *direction = RIGHT;
-        break;
-    }
+    *direction = (*direction + 1) % 4;
 }
 
 void mazePathAdd(int mazePath[GRID_WIDTH * GRID_HEIGHT][2], int *counter, int *robotX, int *robotY)
@@ -590,20 +542,6 @@ void printSolved(int mazePath[GRID_WIDTH * GRID_HEIGHT][2])
     }
 }
 
-void endFound()
-{
-    clear();
-    background();
-    clear();
-
-    setColour(black);
-    fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-    foreground();
-    setColour(white);
-    drawString("Robot has solved the maze", 280, 340);
-}
-
 int main(int argc, char **argv)
 {
     // User chooses whether the maze can have loops
@@ -659,8 +597,6 @@ int main(int argc, char **argv)
 
     deleteRepeat(mazePath);
     printSolved(mazePath);
-
-    // endFound();
 
     return 0;
 }
