@@ -6,13 +6,13 @@
 #include "graphics.h"
 #include <time.h>
 
-#define CanvasWidth 680
-#define CanvasHeight 680
+#define CANVAS_WIDTH 680
+#define CANVAS_HEIGHT 680
 
-#define Right 0
-#define Down 1
-#define Left 2
-#define Up 3
+#define RIGHT 0
+#define DOWN 1
+#define LEFT 2
+#define UP 3
 
 void drawMaze(int maze[17][17])
 {
@@ -213,19 +213,19 @@ void drawRobot(int x, int y, int direction)
 
         switch (direction)
         {
-        case (Right):
+        case (RIGHT):
             fillArc((x - 1) * 40 + 5 + i, y * 40 + 5, 30, 30, 0, 360);
             break;
 
-        case (Down):
+        case (DOWN):
             fillArc(x * 40 + 5, (y - 1) * 40 + 5 + i, 30, 30, 0, 360);
             break;
 
-        case (Left):
+        case (LEFT):
             fillArc((x + 1) * 40 + 5 - i, y * 40 + 5, 30, 30, 0, 360);
             break;
 
-        case (Up):
+        case (UP):
             fillArc(x * 40 + 5, (y + 1) * 40 + 5 - i, 30, 30, 0, 360);
             break;
         }
@@ -238,19 +238,19 @@ int queryMaze(int maze[17][17], int robotX, int robotY, int direction)
 
     switch (direction)
     {
-    case (Right):
+    case (RIGHT):
         return (maze[robotY][robotX + 1]);
         break;
 
-    case (Down):
+    case (DOWN):
         return (maze[robotY + 1][robotX]);
         break;
 
-    case (Left):
+    case (LEFT):
         return (maze[robotY][robotX - 1]);
         break;
 
-    case (Up):
+    case (UP):
         return (maze[robotY - 1][robotX]);
         break;
     }
@@ -297,85 +297,85 @@ void solveMaze(int maze[17][17], int mazeEnd[2], int mazeStart[2], int* directio
         switch (*direction)
         {
         // Right
-        case (Right):
+        case (RIGHT):
             // Facing right
-            if ((queryMaze(maze, *robotX, *robotY, Down) == 0) && (queryMaze(maze, *robotX, *robotY, Right) == 1))
+            if ((queryMaze(maze, *robotX, *robotY, DOWN) == 0) && (queryMaze(maze, *robotX, *robotY, RIGHT) == 1))
             {
                 *robotX += 1;
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Down) == 1)
+            else if (queryMaze(maze, *robotX, *robotY, DOWN) == 1)
             {
-                *direction = Down;
+                *direction = DOWN;
                 *robotY += 1;
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Right) == 0)
+            else if (queryMaze(maze, *robotX, *robotY, RIGHT) == 0)
             {
-                *direction = Up;
+                *direction = UP;
             }
 
             break;
 
         // Down
-        case (Down):
+        case (DOWN):
             // Facing down
-            if ((queryMaze(maze, *robotX, *robotY, Left) == 0) && (queryMaze(maze, *robotX, *robotY, Down) == 1))
+            if ((queryMaze(maze, *robotX, *robotY, LEFT) == 0) && (queryMaze(maze, *robotX, *robotY, DOWN) == 1))
             {
                 *robotY += 1;
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Left) == 1)
+            else if (queryMaze(maze, *robotX, *robotY, LEFT) == 1)
             {
-                *direction = Left;
+                *direction = LEFT;
                 *robotX -= 1;
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Down) == 0)
+            else if (queryMaze(maze, *robotX, *robotY, DOWN) == 0)
             {
-                *direction = Right;
+                *direction = RIGHT;
             }
 
             break;
 
         // Left
-        case (Left):
+        case (LEFT):
             // Facing left
-            if ((queryMaze(maze, *robotX, *robotY, Up) == 0) && (queryMaze(maze, *robotX, *robotY, Left) == 1))
+            if ((queryMaze(maze, *robotX, *robotY, UP) == 0) && (queryMaze(maze, *robotX, *robotY, LEFT) == 1))
             {
                 *robotX -= 1;
                 success = 1;
             }
-            else if ((queryMaze(maze, *robotX, *robotY, Up) == 1))
+            else if ((queryMaze(maze, *robotX, *robotY, UP) == 1))
             {
-                *direction = Up;
+                *direction = UP;
                 *robotY -= 1;
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Left) == 0)
+            else if (queryMaze(maze, *robotX, *robotY, LEFT) == 0)
             {
-                *direction = Down;
+                *direction = DOWN;
             }
 
             break;
 
         // Up
-        case (Up):
+        case (UP):
             // Facing up
-            if ((queryMaze(maze, *robotX, *robotY, Right) == 0) && (queryMaze(maze, *robotX, *robotY, Up) == 1))
+            if ((queryMaze(maze, *robotX, *robotY, RIGHT) == 0) && (queryMaze(maze, *robotX, *robotY, UP) == 1))
             {
                 *robotY -= 1;
                 success = 1;
             }
-            else if ((queryMaze(maze, *robotX, *robotY, Right) == 1))
+            else if ((queryMaze(maze, *robotX, *robotY, RIGHT) == 1))
             {
-                *direction = Right;
+                *direction = RIGHT;
                 *robotX += 1;
                 success = 1;
             }
-            else if (queryMaze(maze, *robotX, *robotY, Up) == 0)
+            else if (queryMaze(maze, *robotX, *robotY, UP) == 0)
             {
-                *direction = Left;
+                *direction = LEFT;
             }
 
             break;
@@ -392,7 +392,7 @@ void endFound()
     clear();
 
     setColour(black);
-    fillRect(0, 0, CanvasWidth, CanvasHeight);
+    fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     foreground();
     setColour(white);
@@ -406,7 +406,7 @@ int main()
 
     srand((unsigned int)time(NULL));
 
-    setWindowSize(CanvasWidth, CanvasHeight);
+    setWindowSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // change to calloc? so memory gets allocated and bits get changed to 0. This prevents old memory from being accessed.
 

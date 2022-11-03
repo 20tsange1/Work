@@ -457,6 +457,11 @@ class Model():
             self.controller.update_score(self.score)
             self.check_frog()
             self.checkspeed()
+
+            # Bugfix 7
+            if int(self.end_time - time.time()) == 0:
+                self.game_over()
+                
         elif self.paused:
             self.check_pause()
 

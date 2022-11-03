@@ -54,6 +54,24 @@ void resetMaze(int maze[GRID_HEIGHT][GRID_WIDTH])
     memset(maze, 0, sizeof(maze[0][0]) * GRID_HEIGHT * GRID_WIDTH);
 }
 
+void resetmazePath(int mazePath[GRID_HEIGHT * GRID_WIDTH][2])
+{
+    memset(mazePath, -1, sizeof(mazePath[0][0]) * GRID_HEIGHT * GRID_WIDTH * 2);
+}
+
+int createEntrance(int maze[GRID_HEIGHT][GRID_WIDTH])
+{
+    for (int i = 1; i < GRID_HEIGHT - 1; i++)
+    {
+        if (maze[i][1]) // To check if there is a valid previous passage to enter from.
+        {
+            maze[i][0] = 1;
+            return i;
+        }
+    }
+    return -1;
+}
+
 int createExit(int maze[GRID_HEIGHT][GRID_WIDTH])
 {
     for (int i = GRID_HEIGHT - 1; i > 1; i--)
@@ -65,6 +83,17 @@ int createExit(int maze[GRID_HEIGHT][GRID_WIDTH])
         }
     }
     return -1;
+}
+
+void initialiseEE(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeStart[2], int mazeEnd[2])
+{
+    // Creating a valid entrance;
+    mazeStart[0] = 0;
+    mazeStart[1] = createEntrance(maze);
+
+    // Creating a valid exit on the rightmost side.
+    mazeEnd[0] = GRID_WIDTH - 1;
+    mazeEnd[1] = createExit(maze);
 }
 
 // Recursive algorithm to generate maze by exploring path possibilities.
@@ -263,7 +292,7 @@ void setY(int coordY[3], int y, int i, int direction)
     }
 }
 
-void drawRobot(int x, int y, int direction)
+void drawRobot(int *x, int *y, int direction)
 {
     int coordX[3];
     int coordY[3];
@@ -271,7 +300,7 @@ void drawRobot(int x, int y, int direction)
     foreground();
     setColour(blue);
 
-    // Creates illusion of movement by redrawing the robot 40 times.
+    // Creates illusion of movement by redrawing the robot SIDE_LENGTH times.
     for (int i = 0; i < SIDE_LENGTH; i++)
     {
         sleep(5);
@@ -280,26 +309,26 @@ void drawRobot(int x, int y, int direction)
         switch (direction)
         {
         case (RIGHT):
-            setX(coordX, (x - 1), i, direction);
-            setY(coordY, y, 0, direction);
+            setX(coordX, (*x - 1), i, direction);
+            setY(coordY, *y, 0, direction);
             fillPolygon(3, coordX, coordY);
             break;
 
         case (DOWN):
-            setX(coordX, x, 0, direction);
-            setY(coordY, (y - 1), i, direction);
+            setX(coordX, *x, 0, direction);
+            setY(coordY, (*y - 1), i, direction);
             fillPolygon(3, coordX, coordY);
             break;
 
         case (LEFT):
-            setX(coordX, (x + 1), -i, direction);
-            setY(coordY, y, 0, direction);
+            setX(coordX, (*x + 1), -i, direction);
+            setY(coordY, *y, 0, direction);
             fillPolygon(3, coordX, coordY);
             break;
 
         case (UP):
-            setX(coordX, x, 0, direction);
-            setY(coordY, (y + 1), -i, direction);
+            setX(coordX, *x, 0, direction);
+            setY(coordY, (*y + 1), -i, direction);
             fillPolygon(3, coordX, coordY);
             break;
         }
@@ -307,32 +336,32 @@ void drawRobot(int x, int y, int direction)
 }
 
 // As robot shouldn't directly have access to map layout.
-int canMoveForward(int maze[GRID_HEIGHT][GRID_WIDTH], int robotX, int robotY, int direction)
+int canMoveForward(int maze[GRID_HEIGHT][GRID_WIDTH], int *robotX, int *robotY, int direction)
 {
     switch (direction)
     {
     case (RIGHT):
-        return (maze[robotY][robotX + 1]);
+        return (maze[*robotY][*robotX + 1]);
         break;
 
     case (DOWN):
-        return (maze[robotY + 1][robotX]);
+        return (maze[*robotY + 1][*robotX]);
         break;
 
     case (LEFT):
-        return (maze[robotY][robotX - 1]);
+        return (maze[*robotY][*robotX - 1]);
         break;
 
     case (UP):
-        return (maze[robotY - 1][robotX]);
+        return (maze[*robotY - 1][*robotX]);
         break;
     }
     return 0;
 }
 
-int atMarker(int mazeEnd[2], int robotX, int robotY)
+int atMarker(int mazeEnd[2], int *robotX, int *robotY)
 {
-    if ((robotX == mazeEnd[0]) && (robotY == mazeEnd[1]))
+    if ((*robotX == mazeEnd[0]) && (*robotY == mazeEnd[1]))
     {
         return 1;
     }
@@ -410,19 +439,30 @@ void right(int *direction)
     }
 }
 
-void solveMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeEnd[2], int mazeStart[2], int *direction, int *robotX, int *robotY)
+void mazePathAdd(int mazePath[GRID_WIDTH * GRID_HEIGHT][2], int *counter, int *robotX, int *robotY)
+{
+    mazePath[*counter][0] = *robotX;
+    mazePath[*counter][1] = *robotY;
+    *counter += 1;
+}
+
+void solveMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeEnd[2], int mazeStart[2], int *direction, int *robotX, int *robotY, int mazePath[GRID_WIDTH * GRID_HEIGHT][2])
 {
     int success = 1;
+    int counter = 0;
 
     // Algorithm keeps the wall on the right
 
-    while (!atMarker(mazeEnd, *robotX, *robotY))
+    while (!atMarker(mazeEnd, &*robotX, &*robotY))
     {
 
         // Success variable is so a move is only animated if there is an actual movement, not when there is a turn.
         if (success)
         {
-            drawRobot(*robotX, *robotY, *direction);
+            drawRobot(&*robotX, &*robotY, *direction);
+
+            // Record that the robot has been there.
+            mazePathAdd(mazePath, &counter, &*robotX, &*robotY);
         }
 
         success = 0;
@@ -431,19 +471,19 @@ void solveMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeEnd[2], int mazeStart[
         {
         case (RIGHT):
             // Facing right
-            if (!canMoveForward(maze, *robotX, *robotY, DOWN) &&
-                canMoveForward(maze, *robotX, *robotY, RIGHT))
+            if (!canMoveForward(maze, &*robotX, &*robotY, DOWN) &&
+                canMoveForward(maze, &*robotX, &*robotY, RIGHT))
             {
                 forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (canMoveForward(maze, *robotX, *robotY, DOWN))
+            else if (canMoveForward(maze, &*robotX, &*robotY, DOWN))
             {
                 right(&*direction);
                 forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (!canMoveForward(maze, *robotX, *robotY, RIGHT))
+            else if (!canMoveForward(maze, &*robotX, &*robotY, RIGHT))
             {
                 left(&*direction);
             }
@@ -451,19 +491,19 @@ void solveMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeEnd[2], int mazeStart[
             break;
 
         case (DOWN):
-            if (!canMoveForward(maze, *robotX, *robotY, LEFT) &&
-                canMoveForward(maze, *robotX, *robotY, DOWN))
+            if (!canMoveForward(maze, &*robotX, &*robotY, LEFT) &&
+                canMoveForward(maze, &*robotX, &*robotY, DOWN))
             {
                 forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (canMoveForward(maze, *robotX, *robotY, LEFT))
+            else if (canMoveForward(maze, &*robotX, &*robotY, LEFT))
             {
                 right(&*direction);
                 forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (!canMoveForward(maze, *robotX, *robotY, DOWN))
+            else if (!canMoveForward(maze, &*robotX, &*robotY, DOWN))
             {
                 left(&*direction);
             }
@@ -471,40 +511,39 @@ void solveMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeEnd[2], int mazeStart[
             break;
 
         case (LEFT):
-            if (!canMoveForward(maze, *robotX, *robotY, UP) &&
-                canMoveForward(maze, *robotX, *robotY, LEFT))
+            if (!canMoveForward(maze, &*robotX, &*robotY, UP) &&
+                canMoveForward(maze, &*robotX, &*robotY, LEFT))
             {
                 forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (canMoveForward(maze, *robotX, *robotY, UP))
+            else if (canMoveForward(maze, &*robotX, &*robotY, UP))
             {
                 right(&*direction);
                 forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (!canMoveForward(maze, *robotX, *robotY, LEFT))
+            else if (!canMoveForward(maze, &*robotX, &*robotY, LEFT))
             {
                 left(&*direction);
             }
 
             break;
 
-
         case (UP):
-            if (!canMoveForward(maze, *robotX, *robotY, RIGHT) &&
-                canMoveForward(maze, *robotX, *robotY, UP))
+            if (!canMoveForward(maze, &*robotX, &*robotY, RIGHT) &&
+                canMoveForward(maze, &*robotX, &*robotY, UP))
             {
                 forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (canMoveForward(maze, *robotX, *robotY, RIGHT))
+            else if (canMoveForward(maze, &*robotX, &*robotY, RIGHT))
             {
                 right(&*direction);
                 forward(&*direction, &*robotX, &*robotY);
                 success = 1;
             }
-            else if (!canMoveForward(maze, *robotX, *robotY, UP))
+            else if (!canMoveForward(maze, &*robotX, &*robotY, UP))
             {
                 left(&*direction);
             }
@@ -513,7 +552,42 @@ void solveMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeEnd[2], int mazeStart[
         }
     }
 
-    drawRobot(*robotX, *robotY, *direction);
+    drawRobot(&*robotX, &*robotY, *direction);
+    mazePathAdd(mazePath, &counter, &*robotX, &*robotY);
+}
+
+void deleteRepeat(int mazePath[GRID_WIDTH * GRID_HEIGHT][2])
+{
+    for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++)
+    {
+        if ((mazePath[i][0] != -1) && (mazePath[i][1] != -1))
+        {
+            for (int j = GRID_WIDTH * GRID_HEIGHT - 1; j > i; j--)
+            {
+                if ((mazePath[i][0] == mazePath[j][0]) && (mazePath[i][1] == mazePath[j][1]))
+                {
+                    for (int m = i + 1; m < j; m++)
+                    {
+                        mazePath[m][0] = -1;
+                        mazePath[m][1] = -1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void printSolved(int mazePath[GRID_WIDTH * GRID_HEIGHT][2])
+{
+    setColour(red);
+    for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++)
+    {
+        if (!(mazePath[i][0] == -1))
+        {
+            sleep(100);
+            fillRect(mazePath[i][0] * SIDE_LENGTH, mazePath[i][1] * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
+        }
+    }
 }
 
 void endFound()
@@ -545,9 +619,10 @@ int main(int argc, char **argv)
     setWindowSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
     int maze[GRID_HEIGHT][GRID_WIDTH];
+    int mazePath[GRID_WIDTH * GRID_HEIGHT][2];
 
-    int currentX = 1;
-    int currentY = 1;
+    int currentX = 8;
+    int currentY = 8;
 
     int mazeStart[2];
     int mazeEnd[2];
@@ -558,15 +633,8 @@ int main(int argc, char **argv)
     int direction = 0;
 
     resetMaze(maze);
+    resetmazePath(mazePath);
 
-    // As we are setting the maze start at 0,1
-    mazeStart[0] = 0;
-    mazeStart[1] = 1;
-
-    robotX = mazeStart[0];
-    robotY = mazeStart[1];
-
-    maze[mazeStart[1]][mazeStart[0]] = 1;
     maze[currentY][currentX] = 1;
 
     switch (loop)
@@ -580,15 +648,19 @@ int main(int argc, char **argv)
         break;
     }
 
-    // Creating a valid exit on the rightmost side.
-    mazeEnd[0] = GRID_WIDTH - 1;
-    mazeEnd[1] = createExit(maze);
+    initialiseEE(maze, mazeStart, mazeEnd);
+
+    robotX = mazeStart[0];
+    robotY = mazeStart[1];
 
     drawMaze(maze);
 
-    solveMaze(maze, mazeEnd, mazeStart, &direction, &robotX, &robotY);
+    solveMaze(maze, mazeEnd, mazeStart, &direction, &robotX, &robotY, mazePath);
 
-    endFound();
+    deleteRepeat(mazePath);
+    printSolved(mazePath);
+
+    // endFound();
 
     return 0;
 }

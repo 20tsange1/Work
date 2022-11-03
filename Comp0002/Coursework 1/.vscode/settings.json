@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "array": "c",
+        "vector": "c",
+        "__node_handle": "c"
+    }
+}
