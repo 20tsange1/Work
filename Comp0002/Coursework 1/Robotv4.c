@@ -10,6 +10,8 @@
 
 #define SIDE_LENGTH (40)
 
+#define ANIMATION_SPEED (2)
+
 #define CANVAS_HEIGHT (SIDE_LENGTH * GRID_HEIGHT)
 #define CANVAS_WIDTH (SIDE_LENGTH * GRID_WIDTH)
 
@@ -315,7 +317,7 @@ void drawRobot(int *x, int *y, int direction)
     // Creates illusion of movement by redrawing the robot SIDE_LENGTH times.
     for (int i = 0; i < SIDE_LENGTH; i++)
     {
-        sleep(5);
+        sleep(ANIMATION_SPEED);
         clear();
 
         setX(coordX, (*x + xMulti), i * -xMulti, direction);
@@ -387,6 +389,7 @@ void turnRight(int *direction)
 
 int nextMove(int maze[GRID_HEIGHT][GRID_WIDTH], int *robotX, int *robotY, int *direction)
 {
+    // Checks for wall on right otherwise turn.
     if (!canMoveForward(maze, &*robotX, &*robotY, (*direction + 1) % 4) &&
         canMoveForward(maze, &*robotX, &*robotY, *direction))
     {
@@ -472,7 +475,7 @@ void printSolved(int mazePath[GRID_WIDTH * GRID_HEIGHT][2])
         if (!(mazePath[i][0] == -1))
         {
             sleep(100);
-            fillRect(mazePath[i][0] * SIDE_LENGTH, mazePath[i][1] * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
+            fillRect(mazePath[i][0] * SIDE_LENGTH + BOT_OFFSET, mazePath[i][1] * SIDE_LENGTH + BOT_OFFSET, SIDE_LENGTH - BOT_OFFSET * 2, SIDE_LENGTH - BOT_OFFSET * 2);
         }
     }
 }
@@ -481,9 +484,13 @@ int main(int argc, char **argv)
 {
     // User chooses whether the maze can have loops
     int loop = 0;
+
     if (argc == 2)
     {
-        loop = atoi(argv[1]);
+        if ((atoi(argv[1]) == 0) || (atoi(argv[1]) == 1))
+        {
+            loop = atoi(argv[1]);
+        }
     }
 
     // Initialisation of a new seed for the random function.
