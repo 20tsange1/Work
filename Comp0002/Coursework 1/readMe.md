@@ -27,8 +27,8 @@ Requirements:
 
 Program should be run using the following two commands:
 
-gcc -o Robotv2 Robotv2.c graphics.c    
-./Robotv2 LOOP | java -jar drawapp-2.0.jar
+gcc -o mazeRobotFinal mazeRobotFinal.c graphics.c    
+./mazeRobotFinal LOOP | java -jar drawapp-2.0.jar
 
 * Where LOOP must be replaced by either (DEFAULT = 0):
     0 = No loops
