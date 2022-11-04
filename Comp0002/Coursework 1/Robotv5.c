@@ -106,22 +106,22 @@ void setMaze(int maze[GRID_WIDTH][GRID_WIDTH], int currentX, int currentY, int d
         {
         case (RIGHT):
             maze[currentY][currentX + i] = 1;
-            fillRect( (currentX + i) * SIDE_LENGTH, currentY * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
+            fillRect((currentX + i) * SIDE_LENGTH, currentY * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
             break;
 
         case (DOWN):
             maze[currentY + i][currentX] = 1;
-            fillRect( currentX * SIDE_LENGTH, (currentY + i) * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
+            fillRect(currentX * SIDE_LENGTH, (currentY + i) * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
             break;
 
         case (LEFT):
             maze[currentY][currentX - i] = 1;
-            fillRect( (currentX - i) * SIDE_LENGTH, currentY * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
+            fillRect((currentX - i) * SIDE_LENGTH, currentY * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
             break;
 
         case (UP):
             maze[currentY - i][currentX] = 1;
-            fillRect( currentX * SIDE_LENGTH, (currentY - i) * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
+            fillRect(currentX * SIDE_LENGTH, (currentY - i) * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
             break;
         }
     }
@@ -225,49 +225,49 @@ void generateTwoMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int currentX, int curren
 
         if (direction != prevOrientation)
         {
-        switch (direction)
-        {
-
-        case (RIGHT):
-            // Checks for validity of new path. (Two sides are walls + not connecting through to another path)
-            if (
-                (currentX + 2 < GRID_WIDTH - 1) &&
-                checkPathValid(maze, currentX, currentY, 1, 0, 0, 1, 2))
+            switch (direction)
             {
-                setMaze(maze, currentX, currentY, direction, 2);
-                generateTwoMaze(maze, currentX + 2, currentY, LEFT);
-            }
-            break;
 
-        case (DOWN):
-            if ((currentY + 2 < GRID_HEIGHT - 1) &&
-                checkPathValid(maze, currentX, currentY, 0, 1, 1, 0, 2))
-            {
-                setMaze(maze, currentX, currentY, direction, 2);
-                generateTwoMaze(maze, currentX, currentY + 2, UP);
-            }
-            break;
+            case (RIGHT):
+                // Checks for validity of new path. (Two sides are walls + not connecting through to another path)
+                if (
+                    (currentX + 2 < GRID_WIDTH - 1) &&
+                    checkPathValid(maze, currentX, currentY, 1, 0, 0, 1, 2))
+                {
+                    setMaze(maze, currentX, currentY, direction, 2);
+                    generateTwoMaze(maze, currentX + 2, currentY, LEFT);
+                }
+                break;
 
-        case (LEFT):
-            if ((currentX - 2 > 0) &&
-                checkPathValid(maze, currentX, currentY, -1, 0, 0, 1, 2))
-            {
-                setMaze(maze, currentX, currentY, direction, 2);
-                generateTwoMaze(maze, currentX - 2, currentY, RIGHT);
-            }
-            break;
+            case (DOWN):
+                if ((currentY + 2 < GRID_HEIGHT - 1) &&
+                    checkPathValid(maze, currentX, currentY, 0, 1, 1, 0, 2))
+                {
+                    setMaze(maze, currentX, currentY, direction, 2);
+                    generateTwoMaze(maze, currentX, currentY + 2, UP);
+                }
+                break;
 
-        case (UP):
-            if (
-                (currentY - 2 > 0) &&
-                checkPathValid(maze, currentX, currentY, 0, -1, 1, 0, 2))
-            {
-                setMaze(maze, currentX, currentY, direction, 2);
-                generateTwoMaze(maze, currentX, currentY - 2, DOWN);
+            case (LEFT):
+                if ((currentX - 2 > 0) &&
+                    checkPathValid(maze, currentX, currentY, -1, 0, 0, 1, 2))
+                {
+                    setMaze(maze, currentX, currentY, direction, 2);
+                    generateTwoMaze(maze, currentX - 2, currentY, RIGHT);
+                }
+                break;
+
+            case (UP):
+                if (
+                    (currentY - 2 > 0) &&
+                    checkPathValid(maze, currentX, currentY, 0, -1, 1, 0, 2))
+                {
+                    setMaze(maze, currentX, currentY, direction, 2);
+                    generateTwoMaze(maze, currentX, currentY - 2, DOWN);
+                }
+                break;
             }
-            break;
         }
-    }
     }
 }
 
@@ -589,7 +589,7 @@ int main(int argc, char **argv)
 
     if (argc == 2)
     {
-        if ( (atoi(argv[1]) >= 0) && (atoi(argv[1]) <= 2) )
+        if ((atoi(argv[1]) >= 0) && (atoi(argv[1]) <= 2))
         {
             loop = atoi(argv[1]);
         }
@@ -636,7 +636,7 @@ int main(int argc, char **argv)
     robotX = mazeStart[0];
     robotY = mazeStart[1];
 
-    clear();   
+    clear();
     drawMaze(maze);
 
     foreground();
