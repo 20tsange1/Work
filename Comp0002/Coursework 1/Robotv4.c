@@ -5,10 +5,10 @@
 #include <string.h>
 #include <math.h>
 
-#define GRID_HEIGHT (17)
-#define GRID_WIDTH (17)
+#define GRID_HEIGHT (31)
+#define GRID_WIDTH (31)
 
-#define SIDE_LENGTH (40)
+#define SIDE_LENGTH (20)
 
 #define ANIMATION_SPEED (2)
 
@@ -17,7 +17,7 @@
 
 #define BOT_DIAMETER (SIDE_LENGTH * 0.75)
 
-#define BOT_OFFSET ((SIDE_LENGTH - BOT_DIAMETER) / 2)
+#define BOT_OFFSET ((SIDE_LENGTH - BOT_DIAMETER) * 0.5)
 
 enum directions
 {
@@ -45,8 +45,8 @@ void drawMaze(int maze[GRID_HEIGHT][GRID_WIDTH])
                 setColour(black);
             }
             fillRect(x * SIDE_LENGTH, y * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
-            setColour(black);
-            drawRect(x * SIDE_LENGTH, y * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
+            // setColour(black);
+            // drawRect(x * SIDE_LENGTH, y * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
         }
     }
 }
@@ -98,6 +98,55 @@ void initialiseEE(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeStart[2], int mazeE
     mazeEnd[1] = createExit(maze);
 }
 
+void setMaze(int maze[GRID_WIDTH][GRID_WIDTH], int currentX, int currentY, int direction, int num)
+{
+    for (int i = 1; i <= num; i++)
+    {
+        switch (direction)
+        {
+        case (RIGHT):
+            maze[currentY][currentX + i] = 1;
+            break;
+
+        case (DOWN):
+            maze[currentY + i][currentX] = 1;
+            break;
+
+        case (LEFT):
+            maze[currentY][currentX - i] = 1;
+            break;
+
+        case (UP):
+            maze[currentY - i][currentX] = 1;
+            break;
+        }
+    }
+}
+
+int checkPathValid(int maze[GRID_HEIGHT][GRID_WIDTH], int currentX, int currentY, int xmulti, int ymulti, int xmulti2, int ymulti2, int num)
+{
+    int counter = 0;
+    for (int i = 1; i <= num; i++)
+    {
+        if (!maze[currentY + (i + 1) * ymulti][currentX + (i + 1) * xmulti])
+        {
+            counter++;
+        }
+        if (!maze[currentY + (i * ymulti) + (1 * ymulti2)][currentX + (i * xmulti) + (1 * xmulti2)] &&
+            !maze[currentY + (i * ymulti) - (1 * ymulti2)][currentX + (i * xmulti) - (1 * xmulti2)])
+        {
+            counter++;
+        }
+    }
+
+    if (counter == 2 * num)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 // Recursive algorithm to generate maze by exploring path possibilities.
 void generateMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int currentX, int currentY, int prevOrientation)
 {
@@ -118,54 +167,103 @@ void generateMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int currentX, int currentY,
 
             case (RIGHT):
                 // Checks for validity of new path. (Two sides are walls + not connecting through to another path)
-                if (
-                    ((currentX + 1 < GRID_WIDTH - 1) &&
-                     (!maze[currentY][currentX + 2])) &&
-                    ((!maze[currentY + 1][currentX + 1]) &&
-                     (!maze[currentY - 1][currentX + 1])))
+                if ((currentX + 1 < GRID_WIDTH - 1) &&
+                    checkPathValid(maze, currentX, currentY, 1, 0, 0, 1, 1))
                 {
-                    maze[currentY][currentX + 1] = 1;
+                    setMaze(maze, currentX, currentY, direction, 1);
                     generateMaze(maze, currentX + 1, currentY, LEFT);
                 }
                 break;
 
             case (DOWN):
-                if (
-                    ((currentY + 1 < GRID_HEIGHT - 1) &&
-                     (!maze[currentY + 2][currentX])) &&
-                    ((!maze[currentY + 1][currentX + 1]) &&
-                     (!maze[currentY + 1][currentX - 1])))
+                if ((currentY + 1 < GRID_HEIGHT - 1) &&
+                    checkPathValid(maze, currentX, currentY, 0, 1, 1, 0, 1))
                 {
-                    maze[currentY + 1][currentX] = 1;
+                    setMaze(maze, currentX, currentY, direction, 1);
                     generateMaze(maze, currentX, currentY + 1, UP);
                 }
                 break;
 
             case (LEFT):
-                if (
-                    ((currentX - 1 > 0) &&
-                     (!maze[currentY][currentX - 2])) &&
-                    ((!maze[currentY + 1][currentX - 1]) &&
-                     (!maze[currentY - 1][currentX - 1])))
+                if ((currentX - 1 > 0) &&
+                    checkPathValid(maze, currentX, currentY, -1, 0, 0, 1, 1))
                 {
-                    maze[currentY][currentX - 1] = 1;
+                    setMaze(maze, currentX, currentY, direction, 1);
                     generateMaze(maze, currentX - 1, currentY, RIGHT);
                 }
                 break;
 
             case (UP):
-                if (
-                    ((currentY - 1 > 0) &&
-                     (!maze[currentY - 2][currentX])) &&
-                    ((!maze[currentY - 1][currentX + 1]) &&
-                     (!maze[currentY - 1][currentX - 1])))
+                if ((currentY - 1 > 0) &&
+                    checkPathValid(maze, currentX, currentY, 0, -1, 1, 0, 1))
                 {
-                    maze[currentY - 1][currentX] = 1;
+                    setMaze(maze, currentX, currentY, direction, 1);
                     generateMaze(maze, currentX, currentY - 1, DOWN);
                 }
                 break;
             }
         }
+    }
+}
+
+// Makes more "perfect" mazes
+void generateTwoMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int currentX, int currentY, int prevOrientation)
+{
+    int direction;
+
+    // This is so it starts at a random direction first before cycling through the rest.
+    int firstDirection = rand() % 4;
+
+    for (int i = 0; i < 4; i++)
+    {
+        // So all 4 sides are attempted
+        direction = (firstDirection + i) % 4;
+
+        if (direction != prevOrientation)
+        {
+        switch (direction)
+        {
+
+        case (RIGHT):
+            // Checks for validity of new path. (Two sides are walls + not connecting through to another path)
+            if (
+                (currentX + 2 < GRID_WIDTH - 1) &&
+                checkPathValid(maze, currentX, currentY, 1, 0, 0, 1, 2))
+            {
+                setMaze(maze, currentX, currentY, direction, 2);
+                generateTwoMaze(maze, currentX + 2, currentY, LEFT);
+            }
+            break;
+
+        case (DOWN):
+            if ((currentY + 2 < GRID_HEIGHT - 1) &&
+                checkPathValid(maze, currentX, currentY, 0, 1, 1, 0, 2))
+            {
+                setMaze(maze, currentX, currentY, direction, 2);
+                generateTwoMaze(maze, currentX, currentY + 2, UP);
+            }
+            break;
+
+        case (LEFT):
+            if ((currentX - 2 > 0) &&
+                checkPathValid(maze, currentX, currentY, -1, 0, 0, 1, 2))
+            {
+                setMaze(maze, currentX, currentY, direction, 2);
+                generateTwoMaze(maze, currentX - 2, currentY, RIGHT);
+            }
+            break;
+
+        case (UP):
+            if (
+                (currentY - 2 > 0) &&
+                checkPathValid(maze, currentX, currentY, 0, -1, 1, 0, 2))
+            {
+                setMaze(maze, currentX, currentY, direction, 2);
+                generateTwoMaze(maze, currentX, currentY - 2, DOWN);
+            }
+            break;
+        }
+    }
     }
 }
 
@@ -475,7 +573,7 @@ void printSolved(int mazePath[GRID_WIDTH * GRID_HEIGHT][2])
         if (!(mazePath[i][0] == -1))
         {
             sleep(100);
-            fillRect(mazePath[i][0] * SIDE_LENGTH + BOT_OFFSET, mazePath[i][1] * SIDE_LENGTH + BOT_OFFSET, SIDE_LENGTH - BOT_OFFSET * 2, SIDE_LENGTH - BOT_OFFSET * 2);
+            fillRect(mazePath[i][0] * SIDE_LENGTH, mazePath[i][1] * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
         }
     }
 }
@@ -483,11 +581,11 @@ void printSolved(int mazePath[GRID_WIDTH * GRID_HEIGHT][2])
 int main(int argc, char **argv)
 {
     // User chooses whether the maze can have loops
-    int loop = 0;
+    int loop = 1;
 
     if (argc == 2)
     {
-        if ((atoi(argv[1]) == 0) || (atoi(argv[1]) == 1))
+        if ( (atoi(argv[1]) >= 0) && (atoi(argv[1]) <= 2) )
         {
             loop = atoi(argv[1]);
         }
@@ -502,7 +600,7 @@ int main(int argc, char **argv)
 
     int mazePath[GRID_WIDTH * GRID_HEIGHT][2];
 
-    int currentX = 8, currentY = 8;
+    int currentX = GRID_WIDTH / 2, currentY = GRID_HEIGHT / 2;
 
     int mazeStart[2], mazeEnd[2];
 
@@ -522,8 +620,11 @@ int main(int argc, char **argv)
         break;
 
     case (1):
-        generateLoopMaze(maze, currentX, currentY, -1);
+        generateTwoMaze(maze, currentX, currentY, -1);
         break;
+
+    case (2):
+        generateLoopMaze(maze, currentX, currentY, -1);
     }
 
     initialiseEE(maze, mazeStart, mazeEnd);

@@ -23,7 +23,9 @@ Values that can be changed:
 Requirements:
     GRID_HEIGHT * SIDE_LENGTH <= 680
     GRID_WIDTH * SIDE_LENGTH <= 1460
-    ANIMATION_SPEED >= 0
+    GRID_HEIGHT % 4 = 3
+    GRID_WIDTH % 4 = 3
+    ANIMATION_SPEED >= 0 (The greater the speed, the slower the animation)
 
 Program should be run using the following two commands:
 
