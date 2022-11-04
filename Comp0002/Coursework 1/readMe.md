@@ -21,21 +21,21 @@ Values that can be changed:
 - ANIMATION_SPEED
 
 Requirements:
-    GRID_HEIGHT * SIDE_LENGTH <= 680
-    GRID_WIDTH * SIDE_LENGTH <= 1460
-    GRID_HEIGHT % 4 = 3
-    GRID_WIDTH % 4 = 3
-    ANIMATION_SPEED >= 0 (The greater the speed, the slower the animation)
+- GRID_HEIGHT * SIDE_LENGTH <= 680
+- GRID_WIDTH * SIDE_LENGTH <= 1460
+- GRID_HEIGHT % 4 = 3
+- GRID_WIDTH % 4 = 3
+- ANIMATION_SPEED >= 0 (The greater the speed, the slower the animation)
 
 Program should be run using the following two commands:
 
 gcc -o mazeRobotFinal mazeRobotFinal.c graphics.c    
 ./mazeRobotFinal LOOP | java -jar drawapp-2.0.jar
 
-* Where LOOP must be replaced by either (DEFAULT = 0):
-    0 = No loops
-    1 = Longer Length 2 Paths ("Perfect" Maze)
-    2 = Loops
+'*' Where LOOP must be replaced by either (DEFAULT = 0):
+- 0 = No loops
+- 1 = Longer Length 2 Paths ("Perfect" Maze)
+- 2 = Loops
 
 References:
 https://www.tutorialspoint.com/c_standard_library/c_function_srand.htm (For use of srand)
