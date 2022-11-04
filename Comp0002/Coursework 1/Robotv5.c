@@ -45,8 +45,6 @@ void drawMaze(int maze[GRID_HEIGHT][GRID_WIDTH])
                 setColour(black);
             }
             fillRect(x * SIDE_LENGTH, y * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
-            // setColour(black);
-            // drawRect(x * SIDE_LENGTH, y * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
         }
     }
 }
@@ -101,7 +99,7 @@ void initialiseEE(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeStart[2], int mazeE
 void setMaze(int maze[GRID_WIDTH][GRID_WIDTH], int currentX, int currentY, int direction, int num)
 {
     setColour(green);
-    sleep(20);
+    sleep(15);
     for (int i = 1; i <= num; i++)
     {
         switch (direction)
@@ -638,6 +636,7 @@ int main(int argc, char **argv)
     robotX = mazeStart[0];
     robotY = mazeStart[1];
 
+    clear();   
     drawMaze(maze);
 
     foreground();
