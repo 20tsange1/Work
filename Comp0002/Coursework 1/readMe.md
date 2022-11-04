@@ -1,14 +1,14 @@
 The maze generation program utilises a 2D array and my implementation of a recursive random direction maze path generator to build a maze. 
 
-![](https://github.com/20tsange1/Work/blob/main/Comp0002/Coursework%201/mazeScreenshot.png)
+![](https://github.com/20tsange1/Work/blob/main/Comp0002/Coursework%201/mazeGenerated.png)
 
 The robot then attempts to solve the maze using the right hand to the wall rule.
 
 When complete, the program will then print out the solution (shortest) path for the maze in red.
 
-![](https://github.com/20tsange1/Work/blob/main/Comp0002/Coursework%201/solvedMazeScreenshot.png)
+![](https://github.com/20tsange1/Work/blob/main/Comp0002/Coursework%201/mazeGeneratedSolved.png)
 
-Pointers are used within the main functions where possible to alter variables declared in main without intialising new variables.
+Pointers are used within the main functions where possible to alter variables declared in main without intialising new local variables.
 
 The maze can be generated with loops and without loops *.
 
@@ -34,7 +34,8 @@ gcc -o mazeRobotFinal mazeRobotFinal.c graphics.c
 
 * Where LOOP must be replaced by either (DEFAULT = 0):
     0 = No loops
-    1 = Loops
+    1 = Longer Length 2 Paths ("Perfect" Maze)
+    2 = Loops
 
 References:
 https://www.tutorialspoint.com/c_standard_library/c_function_srand.htm (For use of srand)

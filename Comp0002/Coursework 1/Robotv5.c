@@ -100,24 +100,30 @@ void initialiseEE(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeStart[2], int mazeE
 
 void setMaze(int maze[GRID_WIDTH][GRID_WIDTH], int currentX, int currentY, int direction, int num)
 {
+    setColour(green);
+    sleep(20);
     for (int i = 1; i <= num; i++)
     {
         switch (direction)
         {
         case (RIGHT):
             maze[currentY][currentX + i] = 1;
+            fillRect( (currentX + i) * SIDE_LENGTH, currentY * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
             break;
 
         case (DOWN):
             maze[currentY + i][currentX] = 1;
+            fillRect( currentX * SIDE_LENGTH, (currentY + i) * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
             break;
 
         case (LEFT):
             maze[currentY][currentX - i] = 1;
+            fillRect( (currentX - i) * SIDE_LENGTH, currentY * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
             break;
 
         case (UP):
             maze[currentY - i][currentX] = 1;
+            fillRect( currentX * SIDE_LENGTH, (currentY - i) * SIDE_LENGTH, SIDE_LENGTH, SIDE_LENGTH);
             break;
         }
     }
