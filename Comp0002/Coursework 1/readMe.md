@@ -10,7 +10,7 @@ When complete, the program will then print out the solution (shortest) path for 
 
 Pointers are used within the main functions where possible to alter variables declared in main without intialising new local variables.
 
-The maze can be generated with loops and without loops *.
+The maze can be generated with loops and without loops.
 
 Changing the maze sizings will need to be done within the source code itself at the top where the constant values are defined.
 
@@ -32,7 +32,7 @@ Program should be run using the following two commands:
 gcc -o mazeRobotFinal mazeRobotFinal.c graphics.c    
 ./mazeRobotFinal LOOP | java -jar drawapp-2.0.jar
 
-'*' Where LOOP must be replaced by either (DEFAULT = 0):
+Where LOOP must be replaced by either (DEFAULT = 0):
 - 0 = No loops
 - 1 = Longer Length 2 Paths ("Perfect" Maze)
 - 2 = Loops
