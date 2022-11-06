@@ -21,7 +21,7 @@ Values that can be changed:
 - ANIMATION_SPEED
 
 Requirements:
-- GRID_HEIGHT * SIDE_LENGTH <= 680
+- GRID_HEIGHT * SIDE_LENGTH <= 680 (May change depending on screen dimensions, this is the specification for an M2 Macbook Air)
 - GRID_WIDTH * SIDE_LENGTH <= 1460
 - GRID_HEIGHT % 4 = 3
 - GRID_WIDTH % 4 = 3

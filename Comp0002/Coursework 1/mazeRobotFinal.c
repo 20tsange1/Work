@@ -3,7 +3,6 @@
 #include "graphics.h"
 #include <time.h>
 #include <string.h>
-#include <math.h>
 
 #define GRID_HEIGHT (31)
 #define GRID_WIDTH (31)
@@ -76,7 +75,7 @@ int createExit(int maze[GRID_HEIGHT][GRID_WIDTH])
 {
     for (int i = GRID_HEIGHT - 1; i > 1; i--)
     {
-        if (maze[i][GRID_WIDTH - 2]) // To check if there is a valid previous passage to enter from.
+        if (maze[i][GRID_WIDTH - 2])
         {
             maze[i][GRID_WIDTH - 1] = 1;
             return i;
@@ -87,11 +86,9 @@ int createExit(int maze[GRID_HEIGHT][GRID_WIDTH])
 
 void initialiseEE(int maze[GRID_HEIGHT][GRID_WIDTH], int mazeStart[2], int mazeEnd[2])
 {
-    // Creating a valid entrance;
     mazeStart[0] = 0;
     mazeStart[1] = createEntrance(maze);
 
-    // Creating a valid exit on the rightmost side.
     mazeEnd[0] = GRID_WIDTH - 1;
     mazeEnd[1] = createExit(maze);
 }
@@ -156,7 +153,6 @@ void generateMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int currentX, int currentY,
 {
     int direction;
 
-    // This is so it starts at a random direction first before cycling through the rest.
     int firstDirection = rand() % 4;
 
     for (int i = 0; i < 4; i++)
@@ -215,12 +211,10 @@ void generateTwoMaze(int maze[GRID_HEIGHT][GRID_WIDTH], int currentX, int curren
 {
     int direction;
 
-    // This is so it starts at a random direction first before cycling through the rest.
     int firstDirection = rand() % 4;
 
     for (int i = 0; i < 4; i++)
     {
-        // So all 4 sides are attempted
         direction = (firstDirection + i) % 4;
 
         if (direction != prevOrientation)
